@@ -10,13 +10,13 @@
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f8f7f4;color:#1A2B4A;padding:16px}
 .header{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid #C49A3C}
 .logo{width:44px;height:44px;background:#1A2B4A;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#C49A3C;font-weight:bold;flex-shrink:0}
-.header-text h1{font-size:15px;font-weight:700}
+.header-text h1{font-size:15px;font-weight:700;color:#1A2B4A}
 .header-text p{font-size:12px;color:#888;margin-top:2px}
 .metrics{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
 .metric{background:white;border-radius:10px;padding:10px 14px;flex:1;min-width:110px;border:1px solid #eee}
 .metric .label{font-size:11px;color:#888;margin-bottom:3px}
 .metric .value{font-size:18px;font-weight:700}
-.chart-wrap{background:white;border-radius:12px;padding:16px;border:1px solid #eee;position:relative;height:360px}
+.chart-wrap{background:white;border-radius:12px;padding:16px;border:1px solid #eee;position:relative;height:420px}
 .chart-title{font-size:13px;color:#888;text-align:center;margin-top:10px;font-style:italic}
 .note{font-size:11px;color:#bbb;text-align:center;margin-top:4px}
 .footer{margin-top:12px;text-align:center;font-size:11px;color:#aaa}
@@ -32,119 +32,150 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 </div>
 <div class="metrics">
   <div class="metric"><div class="label">Seuil de rentabilité</div><div class="value" style="color:#E24B4A">475 908 €</div></div>
-  <div class="metric"><div class="label">Point mort</div><div class="value" style="color:#C49A3C">Avr 2028</div></div>
+  <div class="metric"><div class="label">Point mort</div><div class="value" style="color:#1A2B4A">Oct 2027</div></div>
   <div class="metric"><div class="label">CA requis/mois</div><div class="value" style="color:#185FA5">39 659 €</div></div>
-  <div class="metric"><div class="label">Atteint en</div><div class="value" style="color:#1D9E75">Mois 20</div></div>
+  <div class="metric"><div class="label">Atteint en</div><div class="value" style="color:#1D9E75">Mois 14</div></div>
 </div>
-<div class="chart-wrap"><canvas id="c"></canvas></div>
-<p class="chart-title">CA cumulé vs Seuil de rentabilité cumulé — Croisement Avr 2028</p>
-<p class="note">Saisonnalité réelle TGDC · Totaux annuels conformes au BP</p>
-
+<div class="chart-wrap">
+  <canvas id="c"></canvas>
+</div>
+<p class="chart-title">CA cumulé HT vs Charges cumulées — Croisement Oct 2027</p>
+<p class="note">Zone rouge = CA &lt; charges cumulées · Zone verte = CA &gt; charges · Saisonnalité réelle TGDC</p>
 <div class="footer">The Gentlemen Drivers Club · Business Plan confidentiel · 2026</div>
-</body></html>
 <script>
 const months=['Sep 26','Oct','Nov','Déc','Jan 27','Fév','Mar','Avr','Mai','Jui','Jul','Aoû','Sep 27','Oct','Nov','Déc','Jan 28','Fév','Mar','Avr','Mai','Jui','Jul','Aoû','Sep 28','Oct','Nov','Déc','Jan 29','Fév','Mar','Avr','Mai','Jui','Jul','Aoû 29'];
 const ca=[47735, 83948, 115223, 149790, 167896, 187648, 215631, 246906, 281473, 317686, 350607, 370359, 464911, 542579, 610116, 684407, 728306, 775582, 836365, 903902, 974816, 1049107, 1120021, 1163920, 1327654, 1467659, 1588680, 1721566, 1804620, 1893606, 2002762, 2123783, 2251923, 2384809, 2515322, 2596001];
-const sr=[39659, 79318, 118977, 158636, 198295, 237954, 277613, 317272, 356931, 396590, 436249, 475908, 515567, 555226, 594885, 634544, 674203, 713862, 753521, 793180, 832839, 872498, 912157, 951816, 991475, 1031134, 1070793, 1110452, 1150111, 1189770, 1229429, 1269088, 1308747, 1348406, 1388065, 1427724];
-new Chart(document.getElementById('c'),{type:'line',data:{labels:months,datasets:[{label:'CA cumulé HT (€)',data:ca,borderColor:'#185FA5',borderWidth:2.5,pointRadius:2,backgroundColor:'rgba(24,95,165,0.08)',fill:false,tension:0.3},{label:'Seuil de rentabilité cumulé (€)',data:sr,borderColor:'#E24B4A',borderWidth:2,borderDash:[6,4],pointRadius:0,fill:false,tension:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top'},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+ctx.parsed.y.toLocaleString('fr-FR')+' €'}}},scales:{x:{ticks:{maxRotation:45,font:{size:10}},grid:{display:false}},y:{ticks:{callback:v=>Math.round(v/1000)+'k€'},grid:{color:'rgba(200,200,200,0.3)'}}}}}); 
-</script>
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TGDC — Résultat 36 mois</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f8f7f4;color:#1A2B4A;padding:16px}
-.header{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid #C49A3C}
-.logo{width:44px;height:44px;background:#1A2B4A;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#C49A3C;font-weight:bold;flex-shrink:0}
-.header-text h1{font-size:15px;font-weight:700}
-.header-text p{font-size:12px;color:#888;margin-top:2px}
-.metrics{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
-.metric{background:white;border-radius:10px;padding:10px 14px;flex:1;min-width:110px;border:1px solid #eee}
-.metric .label{font-size:11px;color:#888;margin-bottom:3px}
-.metric .value{font-size:18px;font-weight:700}
-.chart-wrap{background:white;border-radius:12px;padding:16px;border:1px solid #eee;position:relative;height:360px}
-.chart-title{font-size:13px;color:#888;text-align:center;margin-top:10px;font-style:italic}
-.note{font-size:11px;color:#bbb;text-align:center;margin-top:4px}
-.footer{margin-top:12px;text-align:center;font-size:11px;color:#aaa}
-</style>
-</head>
-<body>
-<div class="header">
-  <div class="logo">TG</div>
-  <div class="header-text">
-    <h1>The Gentlemen Drivers Club</h1>
-    <p>Business Plan 2026 — Résultat Net 36 mois</p>
-  </div>
-</div>
-<div class="metrics">
-  <div class="metric"><div class="label">Résultat A1</div><div class="value" style="color:#E24B4A">-89 k€</div></div>
-  <div class="metric"><div class="label">Résultat A2</div><div class="value" style="color:#1D9E75">+187 k€</div></div>
-  <div class="metric"><div class="label">Résultat A3</div><div class="value" style="color:#1D9E75">+490 k€</div></div>
-  <div class="metric"><div class="label">Point mort</div><div class="value" style="color:#C49A3C">Avr 2028</div></div>
-</div>
-<div class="chart-wrap"><canvas id="c"></canvas></div>
-<p class="chart-title">Évolution du Résultat Net mensuel sur 36 mois</p>
-<p class="note">Saisonnalité réelle TGDC · Totaux annuels conformes au BP</p>
+const sr=[38290, 76579, 114868, 153158, 191448, 229737, 268026, 306316, 344606, 382895, 421184, 459474, 497764, 536053, 574342, 612632, 650922, 689211, 727500, 765790, 804080, 842369, 880658, 918948, 957238, 995527, 1033816, 1072106, 1110396, 1148685, 1186974, 1225264, 1263554, 1301843, 1340132, 1378422];
+const crossIdx=13;
 
-<div class="footer">The Gentlemen Drivers Club · Business Plan confidentiel · 2026</div>
-</body></html>
-<script>
-const months=['Sep 26','Oct','Nov','Déc','Jan 27','Fév','Mar','Avr','Mai','Jui','Jul','Aoû','Sep 27','Oct','Nov','Déc','Jan 28','Fév','Mar','Avr','Mai','Jui','Jul','Aoû','Sep 28','Oct','Nov','Déc','Jan 29','Fév','Mar','Avr','Mai','Jui','Jul','Aoû 29'];
-const all=[...[-9050, -7941, -7466, -7783, -6198, -6357, -7149, -7466, -7783, -7941, -7624, -6357],...[18244, 16654, 15700, 16336, 13475, 13793, 15065, 15700, 16018, 16336, 16018, 13477],...[46938, 43688, 41088, 42713, 35889, 36701, 39464, 41088, 42063, 42713, 42388, 35566]];
-const bg=all.map(v=>v<0?'rgba(226,75,74,0.75)':'rgba(29,158,117,0.75)');
-new Chart(document.getElementById('c'),{type:'bar',data:{labels:months,datasets:[{label:'Résultat mensuel net (€)',data:all,backgroundColor:bg,borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top'},tooltip:{callbacks:{label:ctx=>'Résultat: '+ctx.parsed.y.toLocaleString('fr-FR')+' €'}}},scales:{x:{ticks:{maxRotation:45,font:{size:10}},grid:{display:false}},y:{ticks:{callback:v=>(v<0?'-':'')+Math.round(Math.abs(v)/1000)+'k€'},grid:{color:'rgba(200,200,200,0.3)'}}}}}); 
-</script>
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TGDC — Trésorerie mensuelle</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f8f7f4;color:#1A2B4A;padding:16px}
-.header{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid #C49A3C}
-.logo{width:44px;height:44px;background:#1A2B4A;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#C49A3C;font-weight:bold;flex-shrink:0}
-.header-text h1{font-size:15px;font-weight:700}
-.header-text p{font-size:12px;color:#888;margin-top:2px}
-.metrics{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
-.metric{background:white;border-radius:10px;padding:10px 14px;flex:1;min-width:110px;border:1px solid #eee}
-.metric .label{font-size:11px;color:#888;margin-bottom:3px}
-.metric .value{font-size:18px;font-weight:700}
-.chart-wrap{background:white;border-radius:12px;padding:16px;border:1px solid #eee;position:relative;height:360px}
-.chart-title{font-size:13px;color:#888;text-align:center;margin-top:10px;font-style:italic}
-.note{font-size:11px;color:#bbb;text-align:center;margin-top:4px}
-.footer{margin-top:12px;text-align:center;font-size:11px;color:#aaa}
-</style>
-</head>
-<body>
-<div class="header">
-  <div class="logo">TG</div>
-  <div class="header-text">
-    <h1>The Gentlemen Drivers Club</h1>
-    <p>Business Plan 2026 — Trésorerie mensuelle</p>
-  </div>
-</div>
-<div class="metrics">
-  <div class="metric"><div class="label">Tréso fin A1</div><div class="value" style="color:#1D9E75">+23 k€</div></div>
-  <div class="metric"><div class="label">Tréso fin A2</div><div class="value" style="color:#1D9E75">+206 k€</div></div>
-  <div class="metric"><div class="label">Tréso fin A3</div><div class="value" style="color:#1D9E75">+730 k€</div></div>
-  <div class="metric"><div class="label">Positive dès</div><div class="value" style="color:#C49A3C">Mois 11</div></div>
-</div>
-<div class="chart-wrap"><canvas id="c"></canvas></div>
-<p class="chart-title">Évolution de la Trésorerie cumulée par mois</p>
-<p class="note">A1 : données BPI exactes · A2/A3 : saisonnalité réelle TGDC · Soldes finaux conformes au BP</p>
+const zonesPlugin = {
+  id:'zonesPlugin',
+  afterDraw(chart) {
+    const ctx=chart.ctx, xA=chart.scales.x, yA=chart.scales.y;
 
-<div class="footer">The Gentlemen Drivers Club · Business Plan confidentiel · 2026</div>
-</body></html>
-<script>
-const months=['Sep 26','Oct','Nov','Déc','Jan 27','Fév','Mar','Avr','Mai','Jui','Jul','Aoû','Sep 27','Oct','Nov','Déc','Jan 28','Fév','Mar','Avr','Mai','Jui','Jul','Aoû','Sep 28','Oct','Nov','Déc','Jan 29','Fév','Mar','Avr','Mai','Jui','Jul','Aoû 29'];
-const all=[...[9588, 13924, -756, -7324, -12780, -18126, -12360, -11482, -7493, -393, 9819, 23142],...[44932, 62831, 78395, 95516, 105633, 116528, 130536, 146100, 162442, 179563, 195905, 206021],...[265908, 317115, 361379, 409983, 440360, 472907, 512831, 557095, 603963, 652567, 700303, 729812]];
-const bc=all.map(v=>v<0?'#E24B4A':'#185FA5');
-new Chart(document.getElementById('c'),{type:'line',data:{labels:months,datasets:[{label:'Trésorerie cumulée (€)',data:all,borderColor:'#185FA5',borderWidth:2.5,pointRadius:3,pointBackgroundColor:bc,backgroundColor:'rgba(24,95,165,0.08)',fill:true,tension:0.3},{label:'Zéro',data:all.map(()=>0),borderColor:'rgba(186,117,23,0.5)',borderWidth:1,borderDash:[6,4],pointRadius:0,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top'},tooltip:{callbacks:{label:ctx=>{if(ctx.datasetIndex===1)return'';return'Tréso: '+ctx.parsed.y.toLocaleString('fr-FR')+' €';}}}},scales:{x:{ticks:{maxRotation:45,font:{size:10}},grid:{display:false}},y:{ticks:{callback:v=>(v<0?'-':'')+Math.round(Math.abs(v)/1000)+'k€'},grid:{color:'rgba(200,200,200,0.3)'}}}}}); 
+    // ── Zone déficitaire (rouge pâle) : 0 → crossIdx ──
+    ctx.save();
+    ctx.beginPath();
+    for(let i=0;i<=crossIdx;i++) {
+      const px=xA.getPixelForValue(i), py=yA.getPixelForValue(sr[i]);
+      i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);
+    }
+    for(let i=crossIdx;i>=0;i--) {
+      ctx.lineTo(xA.getPixelForValue(i), yA.getPixelForValue(ca[i]));
+    }
+    ctx.closePath();
+    ctx.fillStyle='rgba(226,75,74,0.13)';
+    ctx.fill();
+    ctx.restore();
+
+    // ── Zone bénéficiaire (verte pâle) : crossIdx → fin ──
+    ctx.save();
+    ctx.beginPath();
+    for(let i=crossIdx;i<ca.length;i++) {
+      const px=xA.getPixelForValue(i), py=yA.getPixelForValue(ca[i]);
+      i===crossIdx?ctx.moveTo(px,py):ctx.lineTo(px,py);
+    }
+    for(let i=ca.length-1;i>=crossIdx;i--) {
+      ctx.lineTo(xA.getPixelForValue(i), yA.getPixelForValue(sr[i]));
+    }
+    ctx.closePath();
+    ctx.fillStyle='rgba(29,158,117,0.13)';
+    ctx.fill();
+    ctx.restore();
+
+    // ── Courbe CA bleue ──
+    ctx.save();
+    ctx.strokeStyle='#185FA5'; ctx.lineWidth=2.5;
+    ctx.beginPath();
+    ca.forEach((v,i)=>{const px=xA.getPixelForValue(i),py=yA.getPixelForValue(v);i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);});
+    ctx.stroke();
+    ctx.restore();
+
+    // ── Courbe seuil rouge pointillée ──
+    ctx.save();
+    ctx.strokeStyle='#E24B4A'; ctx.lineWidth=2; ctx.setLineDash([7,5]);
+    ctx.beginPath();
+    sr.forEach((v,i)=>{const px=xA.getPixelForValue(i),py=yA.getPixelForValue(v);i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);});
+    ctx.stroke();
+    ctx.setLineDash([]); ctx.restore();
+
+    // ── Labels zones ──
+    ctx.save();
+    ctx.font='bold 12px -apple-system,sans-serif';
+    ctx.textAlign='center';
+    ctx.fillStyle='#A32D2D';
+    ctx.fillText('Zone déficitaire', xA.getPixelForValue(6), yA.getPixelForValue((ca[6]+sr[6])/2)+5);
+    ctx.fillStyle='#0F6E56';
+    ctx.fillText('Zone bénéficiaire', xA.getPixelForValue(26), yA.getPixelForValue((ca[26]+sr[26])/2)-8);
+    ctx.restore();
+
+    // ── Étoile bleu marine au point mort ──
+    const pmX=xA.getPixelForValue(crossIdx), pmY=yA.getPixelForValue(ca[crossIdx]);
+    ctx.save();
+    ctx.fillStyle='#1A2B4A';
+    ctx.beginPath();
+    for(let pt=0;pt<5;pt++) {
+      const ox=pmX+13*Math.cos((pt*4*Math.PI/5)-Math.PI/2);
+      const oy=pmY+13*Math.sin((pt*4*Math.PI/5)-Math.PI/2);
+      const ix=pmX+5*Math.cos(((pt*4+2)*Math.PI/5)-Math.PI/2);
+      const iy=pmY+5*Math.sin(((pt*4+2)*Math.PI/5)-Math.PI/2);
+      pt===0?ctx.moveTo(ox,oy):ctx.lineTo(ox,oy);
+      ctx.lineTo(ix,iy);
+    }
+    ctx.closePath(); ctx.fill(); ctx.restore();
+
+    // ── Flèche + label bleu marine ──
+    const ax1=pmX+50, ay1=pmY-50, ax2=pmX+12, ay2=pmY-12;
+    ctx.save();
+    ctx.strokeStyle='#1A2B4A'; ctx.fillStyle='#1A2B4A'; ctx.lineWidth=1.8;
+    ctx.beginPath(); ctx.moveTo(ax1,ay1); ctx.lineTo(ax2,ay2); ctx.stroke();
+    const ang=Math.atan2(ay2-ay1,ax2-ax1);
+    ctx.beginPath();
+    ctx.moveTo(ax2,ay2);
+    ctx.lineTo(ax2-10*Math.cos(ang-0.4),ay2-10*Math.sin(ang-0.4));
+    ctx.lineTo(ax2-10*Math.cos(ang+0.4),ay2-10*Math.sin(ang+0.4));
+    ctx.closePath(); ctx.fill();
+    ctx.font='bold 12px -apple-system,sans-serif';
+    ctx.textAlign='left';
+    ctx.fillText('Point mort', ax1+4, ay1-4);
+    ctx.fillText('Oct 2027', ax1+4, ay1+13);
+    ctx.restore();
+
+    // ── Légende ──
+    const lx=chart.chartArea.left+16, ly=chart.chartArea.top+16;
+    ctx.save();
+    ctx.strokeStyle='#185FA5'; ctx.lineWidth=2.5;
+    ctx.beginPath(); ctx.moveTo(lx,ly+6); ctx.lineTo(lx+24,ly+6); ctx.stroke();
+    ctx.fillStyle='#1A2B4A'; ctx.font='12px -apple-system,sans-serif'; ctx.textAlign='left';
+    ctx.fillText('CA cumulé HT', lx+30, ly+11);
+    ctx.strokeStyle='#E24B4A'; ctx.lineWidth=2; ctx.setLineDash([7,5]);
+    ctx.beginPath(); ctx.moveTo(lx,ly+26); ctx.lineTo(lx+24,ly+26); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='#1A2B4A';
+    ctx.fillText('Charges cumulées', lx+30, ly+31);
+    ctx.restore();
+  }
+};
+
+new Chart(document.getElementById('c'),{
+  type:'line',
+  data:{labels:months,datasets:[
+    {label:'CA cumulé HT',data:ca,borderColor:'rgba(0,0,0,0)',borderWidth:0,pointRadius:0,fill:false},
+    {label:'Charges cumulées',data:sr,borderColor:'rgba(0,0,0,0)',borderWidth:0,pointRadius:0,fill:false}
+  ]},
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{
+      legend:{display:false},
+      tooltip:{callbacks:{label:ctx=>ctx.dataset.label+' : '+ctx.parsed.y.toLocaleString('fr-FR')+' €'}}
+    },
+    scales:{
+      x:{ticks:{maxRotation:45,font:{size:10}},grid:{display:false}},
+      y:{min:0,max:2855601,ticks:{callback:v=>Math.round(v/1000)+'k€'},grid:{color:'rgba(200,200,200,0.2)'}}
+    }
+  },
+  plugins:[zonesPlugin]
+});
 </script>
+</body>
+</html>
