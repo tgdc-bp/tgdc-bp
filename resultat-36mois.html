@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TGDC — Résultat 36 mois</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+         background: #f8f7f4; color: #1A2B4A; padding: 16px; min-height: 100vh; }
+  .header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
+             padding-bottom: 12px; border-bottom: 2px solid #C49A3C; }
+  .logo { width: 44px; height: 44px; background: #1A2B4A; border-radius: 8px;
+           display: flex; align-items: center; justify-content: center;
+           font-size: 18px; color: #C49A3C; font-weight: bold; flex-shrink: 0; }
+  .header-text h1 { font-size: 15px; font-weight: 700; color: #1A2B4A; }
+  .header-text p  { font-size: 12px; color: #888; margin-top: 2px; }
+  .metrics { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .metric { background: white; border-radius: 10px; padding: 10px 14px;
+             flex: 1; min-width: 120px; border: 1px solid #eee; }
+  .metric .label { font-size: 11px; color: #888; margin-bottom: 3px; }
+  .metric .value { font-size: 18px; font-weight: 700; }
+  .chart-wrap { background: white; border-radius: 12px; padding: 16px;
+                 border: 1px solid #eee; position: relative; height: 340px; }
+  .chart-title { font-size: 13px; color: #888; text-align: center;
+                  margin-top: 12px; font-style: italic; }
+  .footer { margin-top: 12px; text-align: center; font-size: 11px; color: #aaa; }
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="logo">TG</div>
+  <div class="header-text">
+    <h1>The Gentlemen Drivers Club</h1>
+    <p>Business Plan 2026 — Résultat 36 mois</p>
+  </div>
+</div>
+<div class="metrics"><div class="metric"><div class="label">Résultat A1</div><div class="value" style="color:#E24B4A">-89 k€</div></div>
+<div class="metric"><div class="label">Résultat A2</div><div class="value" style="color:#1D9E75">+187 k€</div></div>
+<div class="metric"><div class="label">Résultat A3</div><div class="value" style="color:#1D9E75">+490 k€</div></div>
+<div class="metric"><div class="label">Point mort</div><div class="value" style="color:#C49A3C">Avr 2028</div></div>
+</div>
+<div class="chart-wrap">
+  <canvas id="c"></canvas>
+</div>
+<p class="chart-title">Évolution du Résultat Net</p>
+<div class="footer">The Gentlemen Drivers Club · Business Plan confidentiel · 2026</div>
+<script>
+
+const months=['Sep 26','Oct','Nov','Déc','Jan 27','Fév','Mar','Avr','Mai','Jui','Jul','Aoû','Sep 27','Oct','Nov','Déc','Jan 28','Fév','Mar','Avr','Mai','Jui','Jul','Aoû','Sep 28','Oct','Nov','Déc','Jan 29','Fév','Mar','Avr','Mai','Jui','Jul','Aoû 29'];
+function ramp(tot,n,s,e){const d=[];for(let i=0;i<n;i++){const t=i/(n-1);d.push(Math.round((tot/n)*(s+(e-s)*t)));}const diff=tot-d.reduce((a,b)=>a+b,0);d[d.length-1]+=diff;return d;}
+const all=[...ramp(-89115,12,1.5,0.5),...ramp(186816,12,0.25,1.65),...ramp(490299,12,0.55,1.35)];
+const bg=all.map(v=>v<0?'rgba(226,75,74,0.75)':'rgba(29,158,117,0.75)');
+new Chart(document.getElementById('c'),{type:'bar',data:{labels:months,datasets:[{label:'Résultat mensuel net (€)',data:all,backgroundColor:bg,borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top'},tooltip:{callbacks:{label:ctx=>'Résultat: '+ctx.parsed.y.toLocaleString('fr-FR')+' €'}}},scales:{x:{ticks:{maxRotation:45,font:{size:10}},grid:{display:false}},y:{ticks:{callback:v=>(v<0?'-':'')+Math.round(Math.abs(v)/1000)+'k€'},grid:{color:'rgba(200,200,200,0.3)'}}}}});
+
+</script>
+</body>
+</html>

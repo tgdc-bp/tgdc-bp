@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TGDC — Structure Charges A1</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+         background: #f8f7f4; color: #1A2B4A; padding: 16px; min-height: 100vh; }
+  .header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
+             padding-bottom: 12px; border-bottom: 2px solid #C49A3C; }
+  .logo { width: 44px; height: 44px; background: #1A2B4A; border-radius: 8px;
+           display: flex; align-items: center; justify-content: center;
+           font-size: 18px; color: #C49A3C; font-weight: bold; flex-shrink: 0; }
+  .header-text h1 { font-size: 15px; font-weight: 700; color: #1A2B4A; }
+  .header-text p  { font-size: 12px; color: #888; margin-top: 2px; }
+  .metrics { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .metric { background: white; border-radius: 10px; padding: 10px 14px;
+             flex: 1; min-width: 120px; border: 1px solid #eee; }
+  .metric .label { font-size: 11px; color: #888; margin-bottom: 3px; }
+  .metric .value { font-size: 18px; font-weight: 700; }
+  .chart-wrap { background: white; border-radius: 12px; padding: 16px;
+                 border: 1px solid #eee; position: relative; height: 340px; }
+  .chart-title { font-size: 13px; color: #888; text-align: center;
+                  margin-top: 12px; font-style: italic; }
+  .footer { margin-top: 12px; text-align: center; font-size: 11px; color: #aaa; }
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="logo">TG</div>
+  <div class="header-text">
+    <h1>The Gentlemen Drivers Club</h1>
+    <p>Business Plan 2026 — Structure Charges A1</p>
+  </div>
+</div>
+<div class="metrics"><div class="metric"><div class="label">Total charges A1</div><div class="value" style="color:#1A2B4A">476 808 €</div></div>
+<div class="metric"><div class="label">1er poste</div><div class="value" style="color:#185FA5">Salaires 32%</div></div>
+<div class="metric"><div class="label">2e poste</div><div class="value" style="color:#185FA5">Achats 31%</div></div>
+<div class="metric"><div class="label">Loyer</div><div class="value" style="color:#C49A3C">42 000 €</div></div>
+</div>
+<div class="chart-wrap">
+  <canvas id="c"></canvas>
+</div>
+<p class="chart-title">Charges Année 1</p>
+<div class="footer">The Gentlemen Drivers Club · Business Plan confidentiel · 2026</div>
+<script>
+
+const labs=["Salaires & charges","Achats matières","Charges externes","Loyer","Remb. emprunt","Dotations amort.","Charges financières"];
+const vals=[154644,145837,88509,42000,20714,14408,9696];
+const cols=['#1A2B4A','#185FA5','#5A85C4','#C49A3C','#1D9E75','#8FB3D9','#AAAAAA'];
+new Chart(document.getElementById('c'),{type:'bar',data:{labels:labs,datasets:[{label:'Montant HT (€)',data:vals,backgroundColor:cols,borderRadius:4}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>{const pct=(ctx.parsed.x/476808*100).toFixed(1);return ctx.parsed.x.toLocaleString('fr-FR')+' € ('+pct+'%)';}}}},scales:{x:{ticks:{callback:v=>Math.round(v/1000)+'k€'},grid:{color:'rgba(200,200,200,0.3)'}},y:{ticks:{font:{size:11}},grid:{display:false}}}}});
+
+</script>
+</body>
+</html>
