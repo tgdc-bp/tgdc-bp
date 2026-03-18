@@ -40,114 +40,118 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <canvas id="c"></canvas>
 </div>
 <p class="chart-title">Évolution de la Trésorerie cumulée par mois</p>
-<p class="note">Zone rouge = trésorerie négative · Zone bleue = trésorerie positive · A1 : données BPI exactes</p>
+<p class="note">Courbe rouge = trésorerie négative · Courbe bleue + zone = trésorerie positive · A1 : données BPI exactes</p>
 <div class="footer">The Gentlemen Drivers Club · Business Plan confidentiel · 2026</div>
 <script>
 const months=['Sep 26','Oct','Nov','Déc','Jan 27','Fév','Mar','Avr','Mai','Jui','Jul','Aoû','Sep 27','Oct','Nov','Déc','Jan 28','Fév','Mar','Avr','Mai','Jui','Jul','Aoû','Sep 28','Oct','Nov','Déc','Jan 29','Fév','Mar','Avr','Mai','Jui','Jul','Aoû 29'];
 const all=[9588, 13924, -756, -7324, -12780, -18126, -12360, -11482, -7493, -393, 9819, 23142, 44932, 62831, 78395, 95516, 105633, 116528, 130536, 146100, 162442, 179563, 195905, 206021, 265908, 317115, 361379, 409983, 440360, 472907, 512831, 557095, 603963, 652567, 700303, 729812];
-const pointColors=['#185FA5', '#185FA5', '#E24B4A', '#E24B4A', '#E24B4A', '#E24B4A', '#E24B4A', '#E24B4A', '#E24B4A', '#E24B4A', '#185FA5', '#185FA5', '#185FA5', '#185FA5', '#185FA5', '#185FA5', '#185FA5', '#185FA5', '#185FA5', '#185FA5', '#185FA5', '#185FA5', '#185FA5', '#185FA5', '#185FA5', '#185FA5', '#185FA5', '#185FA5', '#185FA5', '#185FA5', '#185FA5', '#185FA5', '#185FA5', '#185FA5', '#185FA5', '#185FA5'];
 const recoveryIdx=10;
 
-// Plugin personnalisé : colorie les segments et zones
-const colorPlugin = {
-  id: 'colorPlugin',
-  beforeDraw(chart) {
-    const ctx = chart.ctx;
-    const xAxis = chart.scales.x;
-    const yAxis = chart.scales.y;
-    const y0 = yAxis.getPixelForValue(0);
-    const chartArea = chart.chartArea;
-
-    // Zone rouge (négative)
-    ctx.save();
-    ctx.fillStyle = 'rgba(226,75,74,0.12)';
-    ctx.fillRect(chartArea.left, y0, chartArea.right - chartArea.left, chartArea.bottom - y0);
-    ctx.restore();
-
-    // Zone bleue (positive)
-    ctx.save();
-    ctx.fillStyle = 'rgba(24,95,165,0.08)';
-    ctx.fillRect(chartArea.left, chartArea.top, chartArea.right - chartArea.left, y0 - chartArea.top);
-    ctx.restore();
-
-    // Ligne zéro pointillée
-    ctx.save();
-    ctx.strokeStyle = 'rgba(100,100,100,0.4)';
-    ctx.lineWidth = 1;
-    ctx.setLineDash([5,5]);
-    ctx.beginPath();
-    ctx.moveTo(chartArea.left, y0);
-    ctx.lineTo(chartArea.right, y0);
-    ctx.stroke();
-    ctx.restore();
-  },
+const customPlugin = {
+  id: 'customPlugin',
   afterDraw(chart) {
-    const ctx = chart.ctx;
+    const ctx  = chart.ctx;
     const xAxis = chart.scales.x;
     const yAxis = chart.scales.y;
+    const y0   = yAxis.getPixelForValue(0);
 
-    // Dessine segments colorés par-dessus la ligne grise de Chart.js
+    // ── 1. Remplissage bleu clair UNIQUEMENT sous la courbe positive (au-dessus de zéro) ──
     ctx.save();
-    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(xAxis.getPixelForValue(0), y0);
+    for(let i=0; i<all.length; i++) {
+      const px = xAxis.getPixelForValue(i);
+      const py = yAxis.getPixelForValue(Math.max(0, all[i]));
+      ctx.lineTo(px, py);
+    }
+    ctx.lineTo(xAxis.getPixelForValue(all.length-1), y0);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(24,95,165,0.13)';
+    ctx.fill();
+    ctx.restore();
+
+    // ── 2. Segments colorés : rouge si négatif, bleu si positif ──
+    ctx.save();
+    ctx.lineWidth = 2.8;
     for(let i=0; i<all.length-1; i++) {
       const x1 = xAxis.getPixelForValue(i);
       const y1 = yAxis.getPixelForValue(all[i]);
       const x2 = xAxis.getPixelForValue(i+1);
       const y2 = yAxis.getPixelForValue(all[i+1]);
-      ctx.strokeStyle = (all[i] < 0 || all[i+1] < 0) ? '#E24B4A' : '#185FA5';
-      ctx.beginPath();
-      ctx.moveTo(x1, y1);
-      ctx.lineTo(x2, y2);
-      ctx.stroke();
+      // Si le segment croise zéro, on le coupe en deux
+      if((all[i] < 0) !== (all[i+1] < 0)) {
+        const ratio = Math.abs(all[i]) / (Math.abs(all[i]) + Math.abs(all[i+1]));
+        const xMid  = x1 + (x2-x1)*ratio;
+        const yMid  = y0;
+        // Partie négative
+        ctx.strokeStyle = '#E24B4A';
+        ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(xMid,yMid); ctx.stroke();
+        // Partie positive
+        ctx.strokeStyle = '#185FA5';
+        ctx.beginPath(); ctx.moveTo(xMid,yMid); ctx.lineTo(x2,y2); ctx.stroke();
+      } else {
+        ctx.strokeStyle = all[i] < 0 ? '#E24B4A' : '#185FA5';
+        ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+      }
     }
-    // Points clés
-    [0, 5, 11, 12, 23, 24, 35].forEach(k => {
-      const px = xAxis.getPixelForValue(k);
-      const py = yAxis.getPixelForValue(all[k]);
-      ctx.fillStyle = all[k] < 0 ? '#E24B4A' : '#185FA5';
-      ctx.beginPath();
-      ctx.arc(px, py, 4, 0, Math.PI*2);
-      ctx.fill();
-    });
     ctx.restore();
 
-    // ── Annotation : trésorerie positive ──
+    // ── 3. Points clés ──
+    [0, 5, 11, 12, 23, 24, 35].forEach(k => {
+      if(k >= all.length) return;
+      ctx.save();
+      ctx.fillStyle = all[k] < 0 ? '#E24B4A' : '#185FA5';
+      ctx.beginPath();
+      ctx.arc(xAxis.getPixelForValue(k), yAxis.getPixelForValue(all[k]), 4, 0, Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+    });
+
+    // ── 4. Ligne zéro pointillée ──
+    ctx.save();
+    ctx.strokeStyle = 'rgba(120,120,120,0.4)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([5,5]);
+    ctx.beginPath();
+    ctx.moveTo(xAxis.left, y0);
+    ctx.lineTo(xAxis.right, y0);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+
+    // ── 5. Annotation : losange + flèche + label "Tréso positive" ──
     const rx = xAxis.getPixelForValue(recoveryIdx);
-    const ry = yAxis.getPixelForValue(0);
+    const ry = y0;
     // Losange bleu marine
     ctx.save();
     ctx.fillStyle = '#1A2B4A';
     ctx.beginPath();
-    ctx.moveTo(rx, ry-9);
-    ctx.lineTo(rx+7, ry);
-    ctx.lineTo(rx, ry+9);
-    ctx.lineTo(rx-7, ry);
+    ctx.moveTo(rx,    ry-9);
+    ctx.lineTo(rx+7,  ry);
+    ctx.lineTo(rx,    ry+9);
+    ctx.lineTo(rx-7,  ry);
     ctx.closePath();
     ctx.fill();
     ctx.restore();
-    // Flèche + label
-    const ax1 = rx + 35, ay1 = ry - 35;
-    const ax2 = rx + 6,  ay2 = ry - 6;
+    // Flèche
+    const ax1 = rx+38, ay1 = ry-40;
+    const ax2 = rx+8,  ay2 = ry-8;
     ctx.save();
     ctx.strokeStyle = '#1A2B4A';
     ctx.fillStyle   = '#1A2B4A';
     ctx.lineWidth   = 1.8;
+    ctx.beginPath(); ctx.moveTo(ax1,ay1); ctx.lineTo(ax2,ay2); ctx.stroke();
+    const ang = Math.atan2(ay2-ay1, ax2-ax1);
     ctx.beginPath();
-    ctx.moveTo(ax1, ay1);
-    ctx.lineTo(ax2, ay2);
-    ctx.stroke();
-    // Tête de flèche
-    const angle = Math.atan2(ay2-ay1, ax2-ax1);
-    ctx.beginPath();
-    ctx.moveTo(ax2, ay2);
-    ctx.lineTo(ax2 - 9*Math.cos(angle-0.4), ay2 - 9*Math.sin(angle-0.4));
-    ctx.lineTo(ax2 - 9*Math.cos(angle+0.4), ay2 - 9*Math.sin(angle+0.4));
-    ctx.closePath();
-    ctx.fill();
+    ctx.moveTo(ax2,ay2);
+    ctx.lineTo(ax2-9*Math.cos(ang-0.4), ay2-9*Math.sin(ang-0.4));
+    ctx.lineTo(ax2-9*Math.cos(ang+0.4), ay2-9*Math.sin(ang+0.4));
+    ctx.closePath(); ctx.fill();
     // Texte
     ctx.font = 'bold 11px -apple-system,sans-serif';
-    ctx.fillText('Tréso positive', ax1 + 4, ay1 - 4);
-    ctx.fillText('(mois 11)', ax1 + 4, ay1 + 10);
+    ctx.textAlign = 'left';
+    ctx.fillText('Tréso positive', ax1+4, ay1-4);
+    ctx.fillText('(mois 11)',   ax1+4, ay1+10);
     ctx.restore();
   }
 };
@@ -179,20 +183,20 @@ new Chart(document.getElementById('c'), {
     },
     scales: {
       x: {
-        ticks: { maxRotation: 45, font: { size: 10 } },
-        grid: { display: false }
+        ticks: { maxRotation:45, font:{ size:10 } },
+        grid: { display:false }
       },
       y: {
         min: -23564,
         max: 817389,
         ticks: {
-          callback: v => (v < 0 ? '-' : '') + Math.round(Math.abs(v)/1000) + 'k€'
+          callback: v => (v<0?'-':'') + Math.round(Math.abs(v)/1000) + 'k€'
         },
-        grid: { color: 'rgba(200,200,200,0.2)' }
+        grid: { color:'rgba(200,200,200,0.2)' }
       }
     }
   },
-  plugins: [colorPlugin]
+  plugins: [customPlugin]
 });
 </script>
 </body>
