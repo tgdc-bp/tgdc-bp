@@ -6,20 +6,20 @@
 <title>TGDC — CA 36 mois</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f8f7f4;color:#1A2B4A;padding:16px}
-  .header{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid #C49A3C}
-  .logo{width:44px;height:44px;background:#1A2B4A;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#C49A3C;font-weight:bold;flex-shrink:0}
-  .header-text h1{font-size:15px;font-weight:700;color:#1A2B4A}
-  .header-text p{font-size:12px;color:#888;margin-top:2px}
-  .metrics{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
-  .metric{background:white;border-radius:10px;padding:10px 14px;flex:1;min-width:120px;border:1px solid #eee}
-  .metric .label{font-size:11px;color:#888;margin-bottom:3px}
-  .metric .value{font-size:18px;font-weight:700}
-  .chart-wrap{background:white;border-radius:12px;padding:16px;border:1px solid #eee;position:relative;height:360px}
-  .chart-title{font-size:13px;color:#888;text-align:center;margin-top:12px;font-style:italic}
-  .note{font-size:11px;color:#aaa;text-align:center;margin-top:6px}
-  .footer{margin-top:12px;text-align:center;font-size:11px;color:#aaa}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f8f7f4;color:#1A2B4A;padding:16px}
+.header{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid #C49A3C}
+.logo{width:44px;height:44px;background:#1A2B4A;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#C49A3C;font-weight:bold;flex-shrink:0}
+.header-text h1{font-size:15px;font-weight:700;color:#1A2B4A}
+.header-text p{font-size:12px;color:#888;margin-top:2px}
+.metrics{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.metric{background:white;border-radius:10px;padding:10px 14px;flex:1;min-width:110px;border:1px solid #eee}
+.metric .label{font-size:11px;color:#888;margin-bottom:3px}
+.metric .value{font-size:18px;font-weight:700}
+.chart-wrap{background:white;border-radius:12px;padding:16px;border:1px solid #eee;position:relative;height:360px}
+.chart-title{font-size:13px;color:#888;text-align:center;margin-top:10px;font-style:italic}
+.note{font-size:11px;color:#bbb;text-align:center;margin-top:4px}
+.footer{margin-top:12px;text-align:center;font-size:11px;color:#aaa}
 </style>
 </head>
 <body>
@@ -38,32 +38,32 @@
 </div>
 <div class="chart-wrap"><canvas id="c"></canvas></div>
 <p class="chart-title">Évolution du Chiffre d'Affaires mensuel HT sur 36 mois</p>
-<p class="note">Saisonnalité réelle : pic septembre (Circuit des Remparts) · creux janvier-février (hivernal) · creux août (estival)</p>
+<p class="note">Saisonnalité réelle : pic septembre (Circuit des Remparts) · creux janvier-février · creux août</p>
 <div class="footer">The Gentlemen Drivers Club · Business Plan confidentiel · 2026</div>
 <script>
 const months=['Sep 26','Oct','Nov','Déc','Jan 27','Fév','Mar','Avr','Mai','Jui','Jul','Aoû','Sep 27','Oct','Nov','Déc','Jan 28','Fév','Mar','Avr','Mai','Jui','Jul','Aoû','Sep 28','Oct','Nov','Déc','Jan 29','Fév','Mar','Avr','Mai','Jui','Jul','Aoû 29'];
-const a1=[47735,36213,31275,34567,18106,19752,27983,31275,34567,36213,32921,19752];
-const a2=[94552,77668,67537,74291,43899,47276,60783,67537,70914,74291,70914,43899];
-const a3=[163734,140005,121021,132886,83054,88986,109156,121021,128140,132886,130513,80679];
+const a1=[47735, 36213, 31275, 34567, 18106, 19752, 27983, 31275, 34567, 36213, 32921, 19752];
+const a2=[94552, 77668, 67537, 74291, 43899, 47276, 60783, 67537, 70914, 74291, 70914, 43899];
+const a3=[163734, 140005, 121021, 132886, 83054, 88986, 109156, 121021, 128140, 132886, 130513, 80679];
 const all=[...a1,...a2,...a3];
+const trend=[18243, 21321, 24399, 27478, 30556, 33634, 36712, 39790, 42869, 45947, 49025, 52103, 55181, 58259, 61338, 64416, 67494, 70572, 73650, 76728, 79807, 82885, 85963, 89041, 92119, 95197, 98276, 101354, 104432, 107510, 110588, 113666, 116745, 119823, 122901, 125979];
 const bg=[...Array(12).fill('rgba(24,95,165,0.55)'),...Array(12).fill('rgba(24,95,165,0.75)'),...Array(12).fill('rgba(24,95,165,0.95)')];
-const n=all.length;
-const xs=Array.from({length:n},(_,i)=>i);
-const mean=all.reduce((a,b)=>a+b,0)/n;
-const sx=xs.reduce((s,x)=>s+(x-mean)*(x-mean),0);
-const sxy=xs.reduce((s,x,i)=>s+(x-mean)*(all[i]-all.reduce((a,b)=>a+b,0)/n),0);
-const slope=sxy/sx;
-const intercept=all.reduce((a,b)=>a+b,0)/n - slope*mean;
-const trend=xs.map(x=>Math.round(slope*x+intercept));
 new Chart(document.getElementById('c'),{
   type:'bar',
-  data:{labels:months,datasets:[
-    {label:'CA mensuel HT (€)',data:all,backgroundColor:bg,borderRadius:3,order:2},
-    {label:'Tendance',data:trend,type:'line',borderColor:'#D85A30',borderWidth:2,pointRadius:0,tension:0.4,fill:false,order:1}
-  ]},
-  options:{responsive:true,maintainAspectRatio:false,
-    plugins:{legend:{display:true,position:'top'},
-      tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+ctx.parsed.y.toLocaleString('fr-FR')+' €'}}},
+  data:{
+    labels:months,
+    datasets:[
+      {label:'CA mensuel HT (€)',data:all,backgroundColor:bg,borderRadius:3,order:2},
+      {label:'Tendance',data:trend,type:'line',borderColor:'#D85A30',borderWidth:2.5,pointRadius:0,tension:0,fill:false,order:1}
+    ]
+  },
+  options:{
+    responsive:true,
+    maintainAspectRatio:false,
+    plugins:{
+      legend:{display:true,position:'top'},
+      tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+ctx.parsed.y.toLocaleString('fr-FR')+' €'}}
+    },
     scales:{
       x:{ticks:{maxRotation:45,font:{size:10}},grid:{display:false}},
       y:{ticks:{callback:v=>Math.round(v/1000)+'k€'},grid:{color:'rgba(200,200,200,0.3)'}}
