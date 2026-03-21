@@ -34,37 +34,25 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <div class="metric"><div class="label">Résultat A1</div><div class="value" style="color:#E24B4A">-89 k€</div></div>
   <div class="metric"><div class="label">Résultat A2</div><div class="value" style="color:#1D9E75">+187 k€</div></div>
   <div class="metric"><div class="label">Résultat A3</div><div class="value" style="color:#1D9E75">+490 k€</div></div>
-  <div class="metric"><div class="label">Point mort</div><div class="value" style="color:#C49A3C">Avr 2028</div></div>
+  <div class="metric"><div class="label">Point mort</div><div class="value" style="color:#333333">Avr 2028</div></div>
 </div>
 <div class="chart-wrap">
   <canvas id="c"></canvas>
-  <div id="annotations" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;"></div>
 </div>
-<p class="chart-title">Évolution du Résultat Net mensuel sur 36 mois</p>
-<p class="note">Saisonnalité réelle TGDC · Totaux annuels conformes au BP</p>
+<p class="chart-title">Évolution du Résultat Net mensuel sur 36 mois — Saisonnalité réelle TGDC</p>
+<p class="note">Pic septembre (Circuit des Remparts) · Creux hivernal jan-fév · Totaux annuels conformes au BP</p>
 <div class="footer">The Gentlemen Drivers Club · Business Plan confidentiel · 2026</div>
 <script>
 const months=['Sep 26','Oct','Nov','Déc','Jan 27','Fév','Mar','Avr','Mai','Jui','Jul','Aoû','Sep 27','Oct','Nov','Déc','Jan 28','Fév','Mar','Avr','Mai','Jui','Jul','Aoû','Sep 28','Oct','Nov','Déc','Jan 29','Fév','Mar','Avr','Mai','Jui','Jul','Aoû 29'];
-const all=[-9050, -7941, -7466, -7783, -6198, -6357, -7149, -7466, -7783, -7941, -7624, -6357, 18244, 16654, 15700, 16336, 13475, 13793, 15065, 15700, 16018, 16336, 16018, 13477, 46938, 43688, 41088, 42713, 35889, 36701, 39464, 41088, 42063, 42713, 42388, 35566];
+const all=[...[-9050, -7941, -7466, -7783, -6198, -6357, -7149, -7466, -7783, -7941, -7624, -6357],...[18244, 16654, 15700, 16336, 13475, 13793, 15065, 15700, 16018, 16336, 16018, 13477],...[46938, 43688, 41088, 42713, 35889, 36701, 39464, 41088, 42063, 42713, 42388, 35566]];
 const bg=all.map(v=>v<0?'rgba(226,75,74,0.75)':'rgba(29,158,117,0.75)');
 
-const chart = new Chart(document.getElementById('c'),{
+const chart=new Chart(document.getElementById('c'),{
   type:'bar',
-  data:{
-    labels:months,
-    datasets:[{
-      label:'Résultat mensuel net (€)',
-      data:all,
-      backgroundColor:bg,
-      borderRadius:3
-    }]
-  },
+  data:{labels:months,datasets:[{label:'Résultat mensuel net (€)',data:all,backgroundColor:bg,borderRadius:3}]},
   options:{
-    responsive:true,
-    maintainAspectRatio:false,
-    animation:{
-      onComplete: function() { drawAnnotations(chart); }
-    },
+    responsive:true,maintainAspectRatio:false,
+    animation:{onComplete:()=>drawAnnotations()},
     plugins:{
       legend:{display:true,position:'top'},
       tooltip:{callbacks:{label:ctx=>'Résultat: '+ctx.parsed.y.toLocaleString('fr-FR')+' €'}}
@@ -72,109 +60,60 @@ const chart = new Chart(document.getElementById('c'),{
     scales:{
       x:{ticks:{maxRotation:45,font:{size:10}},grid:{display:false}},
       y:{
+        min:-11765,
+        max:57264,
         ticks:{callback:v=>(v<0?'-':'')+Math.round(Math.abs(v)/1000)+'k€'},
-        grid:{color:'rgba(200,200,200,0.3)'},
-        min: -11765,
-        max: 57264
+        grid:{color:'rgba(200,200,200,0.3)'}
       }
     }
   }
 });
 
-function drawAnnotations(chart) {
-  const canvas  = chart.canvas;
-  const ctx2    = canvas.getContext('2d');
-  const xAxis   = chart.scales.x;
-  const yAxis   = chart.scales.y;
+function drawAnnotations(){
+  const ctx2=chart.canvas.getContext('2d');
+  const xA=chart.scales.x, yA=chart.scales.y;
 
-  function getXY(dataIdx, val) {
-    const x = xAxis.getPixelForValue(dataIdx);
-    const y = yAxis.getPixelForValue(val);
-    return {x, y};
-  }
-
-  function drawArrow(x1,y1,x2,y2,color,label,labelX,labelY) {
-    ctx2.save();
-    ctx2.strokeStyle = color;
-    ctx2.fillStyle   = color;
-    ctx2.lineWidth   = 1.5;
-    ctx2.setLineDash([]);
-    ctx2.beginPath();
-    ctx2.moveTo(x1,y1);
-    ctx2.lineTo(x2,y2);
-    ctx2.stroke();
-    // Tête de flèche
-    const angle = Math.atan2(y2-y1, x2-x1);
-    ctx2.beginPath();
-    ctx2.moveTo(x2, y2);
-    ctx2.lineTo(x2 - 8*Math.cos(angle-0.4), y2 - 8*Math.sin(angle-0.4));
-    ctx2.lineTo(x2 - 8*Math.cos(angle+0.4), y2 - 8*Math.sin(angle+0.4));
-    ctx2.closePath();
-    ctx2.fill();
-    // Label
-    ctx2.font = 'bold 11px -apple-system,sans-serif';
-    ctx2.textAlign = 'left';
-    const lines = label.split('\n');
-    lines.forEach((line,i) => ctx2.fillText(line, labelX, labelY + i*14));
+  function drawArrow(x1,y1,x2,y2,color,lines,lx,ly){
+    ctx2.save(); ctx2.strokeStyle=color; ctx2.fillStyle=color; ctx2.lineWidth=1.5;
+    ctx2.beginPath(); ctx2.moveTo(x1,y1); ctx2.lineTo(x2,y2); ctx2.stroke();
+    const ang=Math.atan2(y2-y1,x2-x1);
+    ctx2.beginPath(); ctx2.moveTo(x2,y2);
+    ctx2.lineTo(x2-8*Math.cos(ang-0.4),y2-8*Math.sin(ang-0.4));
+    ctx2.lineTo(x2-8*Math.cos(ang+0.4),y2-8*Math.sin(ang+0.4));
+    ctx2.closePath(); ctx2.fill();
+    ctx2.font='bold 11px -apple-system,sans-serif'; ctx2.textAlign='left';
+    lines.forEach((l,i)=>ctx2.fillText(l,lx,ly+i*14));
     ctx2.restore();
   }
 
-  function drawDiamond(x,y,color) {
-    ctx2.save();
-    ctx2.fillStyle = color;
-    ctx2.beginPath();
-    ctx2.moveTo(x, y-8);
-    ctx2.lineTo(x+6, y);
-    ctx2.lineTo(x, y+8);
-    ctx2.lineTo(x-6, y);
-    ctx2.closePath();
-    ctx2.fill();
-    ctx2.restore();
+  function drawDiamond(x,y,color){
+    ctx2.save(); ctx2.fillStyle=color;
+    ctx2.beginPath(); ctx2.moveTo(x,y-8); ctx2.lineTo(x+6,y); ctx2.lineTo(x,y+8); ctx2.lineTo(x-6,y);
+    ctx2.closePath(); ctx2.fill(); ctx2.restore();
   }
 
-  // ── Ligne zéro ──
-  const y0 = yAxis.getPixelForValue(0);
-  ctx2.save();
-  ctx2.strokeStyle = 'rgba(100,100,100,0.5)';
-  ctx2.lineWidth = 1;
-  ctx2.setLineDash([4,4]);
-  ctx2.beginPath();
-  ctx2.moveTo(xAxis.left, y0);
-  ctx2.lineTo(xAxis.right, y0);
-  ctx2.stroke();
+  // Ligne zéro
+  const y0=yA.getPixelForValue(0);
+  ctx2.save(); ctx2.strokeStyle='rgba(100,100,100,0.4)'; ctx2.lineWidth=1; ctx2.setLineDash([4,4]);
+  ctx2.beginPath(); ctx2.moveTo(xA.left,y0); ctx2.lineTo(xA.right,y0); ctx2.stroke();
   ctx2.restore();
 
-  // ── Point mort Avr 2028 (index 19) ──
-  const pm = getXY(19, 0);
-  drawDiamond(pm.x, pm.y, '#C49A3C');
-  const pmLabel = getXY(19, all[19]);
-  drawArrow(
-    pm.x + 30, pm.y - 30,
-    pm.x + 4,  pm.y - 4,
-    '#333333',
-    'Point mort\nAvr 2028',
-    pm.x + 34, pm.y - 44
-  );
+  // Point mort Avr 2028 (index 19)
+  const pm={x:xA.getPixelForValue(19),y:yA.getPixelForValue(0)};
+  drawDiamond(pm.x,pm.y,'#333333');
+  drawArrow(pm.x+35,pm.y-35,pm.x+4,pm.y-4,'#333333',['Point mort','Avr 2028'],pm.x+39,pm.y-47);
 
-  // ── Pic Sep 26 (index 0) ──
-  const pic = getXY(0, all[0]);
-  drawArrow(
-    pic.x + 40, pic.y - 25,
-    pic.x + 4,  pic.y - 4,
-    '#1A2B4A',
-    'Pic Sep 26\n-9,050 €'.replace(',', ' '),
-    pic.x + 44, pic.y - 38
-  );
+  // Plus forte perte Sep 26 (index 0)
+  const p0={x:xA.getPixelForValue(0),y:yA.getPixelForValue(all[0])};
+  drawArrow(p0.x+45,p0.y-20,p0.x+4,p0.y-4,'#1A2B4A',['Plus forte perte','(charges ouverture)'],p0.x+49,p0.y-32);
 
-  // ── Creux hivernal Jan 27 (index 4) ──
-  const creux = getXY(4, all[4]);
-  drawArrow(
-    creux.x + 35, creux.y + 30,
-    creux.x + 4,  creux.y + 4,
-    '#888888',
-    'Creux hivernal\n-6,198 €'.replace(',', ' '),
-    creux.x + 38, creux.y + 44
-  );
+  // Moindre perte Jan 27 (index 4)
+  const p4={x:xA.getPixelForValue(4),y:yA.getPixelForValue(all[4])};
+  drawArrow(p4.x+40,p4.y+35,p4.x+4,p4.y+4,'#888888',['Moindre perte','(creux hivernal)'],p4.x+44,p4.y+47);
+
+  // Pic Sep 27 (index 12)
+  const p12={x:xA.getPixelForValue(12),y:yA.getPixelForValue(all[12])};
+  drawArrow(p12.x+40,p12.y-25,p12.x+4,p12.y-4,'#1D9E75',['Pic Sep 27'],p12.x+44,p12.y-37);
 }
 </script>
 </body>
