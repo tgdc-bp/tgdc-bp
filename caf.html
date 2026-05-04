@@ -1,9 +1,6 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TGDC — CAF 3 ans</title>
+<!DOCTYPE html><html lang="fr"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>TGDC — CAF V3</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -16,124 +13,35 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .metric{background:white;border-radius:10px;padding:10px 14px;flex:1;min-width:110px;border:1px solid #eee}
 .metric .label{font-size:11px;color:#888;margin-bottom:3px}
 .metric .value{font-size:18px;font-weight:700}
-.chart-wrap{background:white;border-radius:12px;padding:16px;border:1px solid #eee;position:relative;height:400px}
+.chart-wrap{background:white;border-radius:12px;padding:16px;border:1px solid #eee;height:380px;position:relative}
 .chart-title{font-size:13px;color:#888;text-align:center;margin-top:10px;font-style:italic}
 .note{font-size:11px;color:#bbb;text-align:center;margin-top:4px}
 .footer{margin-top:12px;text-align:center;font-size:11px;color:#aaa}
-</style>
-</head>
-<body>
-<div class="header">
-  <div class="logo">TG</div>
-  <div class="header-text">
-    <h1>The Gentlemen Drivers Club</h1>
-    <p>Business Plan 2026 — Capacité d'AutoFinancement sur 3 ans</p>
-  </div>
-</div>
-<div class="metrics">
-  <div class="metric"><div class="label">CAF brute A1</div><div class="value" style="color:#7B3F00">-75 k€</div></div>
-  <div class="metric"><div class="label">CAF brute A2</div><div class="value" style="color:#7B3F00">+201 k€</div></div>
-  <div class="metric"><div class="label">CAF brute A3</div><div class="value" style="color:#7B3F00">+505 k€</div></div>
-  <div class="metric"><div class="label">CAF cumulée fin A3</div><div class="value" style="color:#1A2B4A">+569 k€</div></div>
-</div>
-<div class="chart-wrap">
-  <canvas id="c"></canvas>
-</div>
-<p class="chart-title">Capacité d'AutoFinancement — CAF brute, remboursement emprunt, autofinancement net et CAF cumulée</p>
-<p class="note">CAF = trésorerie générée par l'activité avant remboursement des emprunts</p>
-<div class="footer">The Gentlemen Drivers Club · Business Plan confidentiel · 2026</div>
+</style></head><body>
+<div class="header"><div class="logo">TG</div>
+<div class="header-text"><h1>The Gentlemen Drivers Club</h1><p>Business Plan V3 2026 — Capacité d'AutoFinancement 3 ans</p></div></div><div class="metrics"><div class="metric"><div class="label">CAF brute A1</div><div class="value" style="color:#7B3F00">-2 k€</div></div><div class="metric"><div class="label">CAF brute A2</div><div class="value" style="color:#7B3F00">+51 k€</div></div><div class="metric"><div class="label">CAF brute A3</div><div class="value" style="color:#7B3F00">+179 k€</div></div><div class="metric"><div class="label">CAF cumulée A3</div><div class="value" style="color:#1A2B4A">+186 k€</div></div></div><div class="chart-wrap"><canvas id="c"></canvas></div>
+<p class="chart-title">CAF brute · Remboursement emprunt · Autofinancement net · CAF cumulée — V3</p>
+<p class="note">CAF = Capacité d'AutoFinancement = trésorerie générée par l'activité avant remboursement des emprunts</p><div class="footer">The Gentlemen Drivers Club · BP V3 confidentiel · 2026</div></body></html>
 <script>
 const labels=['Année 1','Année 2','Année 3'];
-const caf=[-74707, 201225, 504707];
-const remb=[-20714, -20714, -20714];
-const autofi=[-95421, 180510, 483993];
-const cum=[-95421, 85089, 569082];
-
-const annotPlugin={
-  id:'annotPlugin',
-  afterDraw(chart){
-    const ctx=chart.ctx;
-    const xA=chart.scales.x, yA=chart.scales['y-right'];
-    if(!yA) return;
-    cum.forEach((v,i)=>{
-      const px=xA.getPixelForValue(i);
-      const py=yA.getPixelForValue(v/1000);
-      const offset = v>=0 ? -22 : 14;
-      ctx.save();
-      ctx.fillStyle='#1A2B4A';
-      ctx.font='bold 12px -apple-system,sans-serif';
-      ctx.textAlign='center';
-      ctx.fillText((v<0?'-':'+')+Math.abs(Math.round(v/1000))+' k€', px, py+offset);
-      ctx.restore();
-    });
-  }
-};
-
-new Chart(document.getElementById('c'),{
-  type:'bar',
-  data:{
-    labels,
-    datasets:[
-      {
-        label:'CAF brute',
-        data:caf.map(v=>v/1000),
-        backgroundColor:'rgba(123,63,0,0.85)',
-        borderRadius:4,
-        yAxisID:'y-left'
-      },
-      {
-        label:'Remboursement emprunt',
-        data:remb.map(v=>v/1000),
-        backgroundColor:'rgba(200,134,10,0.85)',
-        borderRadius:4,
-        yAxisID:'y-left'
-      },
-      {
-        label:'Autofinancement net',
-        data:autofi.map(v=>v/1000),
-        backgroundColor:'rgba(216,90,48,0.85)',
-        borderRadius:4,
-        yAxisID:'y-left'
-      },
-      {
-        label:'CAF cumulée',
-        data:cum.map(v=>v/1000),
-        type:'line',
-        borderColor:'#1A2B4A',
-        borderWidth:2.8,
-        pointBackgroundColor:'#1A2B4A',
-        pointBorderColor:'white',
-        pointBorderWidth:2,
-        pointRadius:8,
-        fill:false,
-        yAxisID:'y-right',
-        order:0
-      }
-    ]
-  },
-  options:{
-    responsive:true,
-    maintainAspectRatio:false,
-    plugins:{
-      legend:{display:true,position:'top',labels:{font:{size:11}}},
-      tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+Math.round(ctx.parsed.y)+' k€'}}
-    },
-    scales:{
-      x:{ticks:{font:{size:12,weight:'bold'}},grid:{display:false}},
-      'y-left':{
-        type:'linear',position:'left',
-        ticks:{callback:v=>(v<0?'-':'')+Math.abs(v)+'k€',font:{size:10}},
-        grid:{color:'rgba(200,200,200,0.3)'}
-      },
-      'y-right':{
-        type:'linear',position:'right',
-        ticks:{callback:v=>(v<0?'-':'')+Math.abs(v)+'k€',font:{size:10},color:'#1A2B4A'},
-        grid:{display:false}
-      }
-    }
-  },
-  plugins:[annotPlugin]
-});
-</script>
-</body>
-</html>
+const caf=[-2202, 50648, 178601],remb=[0, -20714, -20714],autofi=[-2202, 29934, 157887],cum=[-2202, 27732, 185619];
+const annotPlugin={id:'ap',afterDraw(chart){
+  const ctx=chart.ctx,yR=chart.scales['y-right'];if(!yR)return;
+  cum.forEach((v,i)=>{
+    const px=chart.scales.x.getPixelForValue(i),py=yR.getPixelForValue(v/1000);
+    ctx.save();ctx.fillStyle='#1A2B4A';ctx.font='bold 12px sans-serif';ctx.textAlign='center';
+    ctx.fillText((v<0?'':'+')+(Math.round(v/1000))+' k€',px,py+(v>=0?-18:16));ctx.restore();
+  });
+}};
+new Chart(document.getElementById('c'),{type:'bar',data:{labels,datasets:[
+  {label:'CAF brute',data:caf.map(v=>v/1000),backgroundColor:'rgba(123,63,0,0.85)',borderRadius:4,yAxisID:'y-left'},
+  {label:'Remboursement emprunt',data:remb.map(v=>v/1000),backgroundColor:'rgba(200,134,10,0.85)',borderRadius:4,yAxisID:'y-left'},
+  {label:'Autofinancement net',data:autofi.map(v=>v/1000),backgroundColor:'rgba(216,90,48,0.85)',borderRadius:4,yAxisID:'y-left'},
+  {label:'CAF cumulée',data:cum.map(v=>v/1000),type:'line',borderColor:'#1A2B4A',borderWidth:2.8,
+    pointBackgroundColor:'#1A2B4A',pointBorderColor:'white',pointBorderWidth:2,pointRadius:8,fill:false,yAxisID:'y-right',order:0}
+]},options:{responsive:true,maintainAspectRatio:false,
+  plugins:{legend:{display:true,position:'top'},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+Math.round(ctx.parsed.y)+' k€'}}},
+  scales:{x:{ticks:{font:{size:12,weight:'bold'}},grid:{display:false}},
+    'y-left':{type:'linear',position:'left',ticks:{callback:v=>(v<0?'-':'')+Math.abs(v)+'k€'},grid:{color:'rgba(200,200,200,0.3)'}},
+    'y-right':{type:'linear',position:'right',ticks:{callback:v=>(v<0?'-':'')+Math.abs(v)+'k€',color:'#1A2B4A'},grid:{display:false}}
+  }},plugins:[annotPlugin]});</script>
