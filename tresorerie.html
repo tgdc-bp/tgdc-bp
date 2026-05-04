@@ -1,9 +1,6 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TGDC — Trésorerie mensuelle</title>
+<!DOCTYPE html><html lang="fr"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>TGDC — Trésorerie V3</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -16,188 +13,41 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .metric{background:white;border-radius:10px;padding:10px 14px;flex:1;min-width:110px;border:1px solid #eee}
 .metric .label{font-size:11px;color:#888;margin-bottom:3px}
 .metric .value{font-size:18px;font-weight:700}
-.chart-wrap{background:white;border-radius:12px;padding:16px;border:1px solid #eee;position:relative;height:400px}
+.chart-wrap{background:white;border-radius:12px;padding:16px;border:1px solid #eee;height:380px;position:relative}
 .chart-title{font-size:13px;color:#888;text-align:center;margin-top:10px;font-style:italic}
 .note{font-size:11px;color:#bbb;text-align:center;margin-top:4px}
 .footer{margin-top:12px;text-align:center;font-size:11px;color:#aaa}
-</style>
-</head>
-<body>
-<div class="header">
-  <div class="logo">TG</div>
-  <div class="header-text">
-    <h1>The Gentlemen Drivers Club</h1>
-    <p>Business Plan 2026 — Trésorerie mensuelle</p>
-  </div>
-</div>
-<div class="metrics">
-  <div class="metric"><div class="label">Tréso fin A1</div><div class="value" style="color:#1D9E75">+23 k€</div></div>
-  <div class="metric"><div class="label">Tréso fin A2</div><div class="value" style="color:#1D9E75">+206 k€</div></div>
-  <div class="metric"><div class="label">Tréso fin A3</div><div class="value" style="color:#1D9E75">+730 k€</div></div>
-  <div class="metric"><div class="label">Positive dès</div><div class="value" style="color:#1A2B4A">Mois 11</div></div>
-</div>
-<div class="chart-wrap">
-  <canvas id="c"></canvas>
-</div>
-<p class="chart-title">Évolution de la Trésorerie cumulée par mois</p>
-<p class="note">Courbe rouge = trésorerie négative · Courbe bleue + zone = trésorerie positive · A1 : données BPI exactes</p>
-<div class="footer">The Gentlemen Drivers Club · Business Plan confidentiel · 2026</div>
+</style></head><body>
+<div class="header"><div class="logo">TG</div>
+<div class="header-text"><h1>The Gentlemen Drivers Club</h1><p>Business Plan V3 2026 — Trésorerie mensuelle</p></div></div><div class="metrics"><div class="metric"><div class="label">Tréso fin A1</div><div class="value" style="color:#1D9E75">+44 k€</div></div><div class="metric"><div class="label">Tréso fin A2</div><div class="value" style="color:#1D9E75">+74 k€</div></div><div class="metric"><div class="label">Tréso fin A3</div><div class="value" style="color:#1D9E75">+232 k€</div></div><div class="metric"><div class="label">Toujours positive</div><div class="value" style="color:#1A2B4A">dès Sep 2026</div></div></div><div class="chart-wrap"><canvas id="c"></canvas></div>
+<p class="chart-title">Évolution de la Trésorerie cumulée par mois — V3</p>
+<p class="note">A1 : données réelles BP V3 · A2/A3 : saisonnalité TGDC · Tréso toujours positive en V3 ✓</p><div class="footer">The Gentlemen Drivers Club · BP V3 confidentiel · 2026</div></body></html>
 <script>
-const months=['Sep 26','Oct','Nov','Déc','Jan 27','Fév','Mar','Avr','Mai','Jui','Jul','Aoû','Sep 27','Oct','Nov','Déc','Jan 28','Fév','Mar','Avr','Mai','Jui','Jul','Aoû','Sep 28','Oct','Nov','Déc','Jan 29','Fév','Mar','Avr','Mai','Jui','Jul','Aoû 29'];
-const all=[9588, 13924, -756, -7324, -12780, -18126, -12360, -11482, -7493, -393, 9819, 23142, 44932, 62831, 78395, 95516, 105633, 116528, 130536, 146100, 162442, 179563, 195905, 206021, 265908, 317115, 361379, 409983, 440360, 472907, 512831, 557095, 603963, 652567, 700303, 729812];
-const recoveryIdx=10;
-
-const customPlugin = {
-  id: 'customPlugin',
-  afterDraw(chart) {
-    const ctx  = chart.ctx;
-    const xAxis = chart.scales.x;
-    const yAxis = chart.scales.y;
-    const y0   = yAxis.getPixelForValue(0);
-
-    // ── 1. Remplissage bleu clair UNIQUEMENT sous la courbe positive (au-dessus de zéro) ──
-    ctx.save();
-    ctx.beginPath();
-    ctx.moveTo(xAxis.getPixelForValue(0), y0);
-    for(let i=0; i<all.length; i++) {
-      const px = xAxis.getPixelForValue(i);
-      const py = yAxis.getPixelForValue(Math.max(0, all[i]));
-      ctx.lineTo(px, py);
-    }
-    ctx.lineTo(xAxis.getPixelForValue(all.length-1), y0);
-    ctx.closePath();
-    ctx.fillStyle = 'rgba(24,95,165,0.13)';
-    ctx.fill();
-    ctx.restore();
-
-    // ── 2. Segments colorés : rouge si négatif, bleu si positif ──
-    ctx.save();
-    ctx.lineWidth = 2.8;
-    for(let i=0; i<all.length-1; i++) {
-      const x1 = xAxis.getPixelForValue(i);
-      const y1 = yAxis.getPixelForValue(all[i]);
-      const x2 = xAxis.getPixelForValue(i+1);
-      const y2 = yAxis.getPixelForValue(all[i+1]);
-      // Si le segment croise zéro, on le coupe en deux
-      if((all[i] < 0) !== (all[i+1] < 0)) {
-        const ratio = Math.abs(all[i]) / (Math.abs(all[i]) + Math.abs(all[i+1]));
-        const xMid  = x1 + (x2-x1)*ratio;
-        const yMid  = y0;
-        // Partie négative
-        ctx.strokeStyle = '#E24B4A';
-        ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(xMid,yMid); ctx.stroke();
-        // Partie positive
-        ctx.strokeStyle = '#185FA5';
-        ctx.beginPath(); ctx.moveTo(xMid,yMid); ctx.lineTo(x2,y2); ctx.stroke();
-      } else {
-        ctx.strokeStyle = all[i] < 0 ? '#E24B4A' : '#185FA5';
-        ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
-      }
-    }
-    ctx.restore();
-
-    // ── 3. Points clés ──
-    [0, 5, 11, 12, 23, 24, 35].forEach(k => {
-      if(k >= all.length) return;
-      ctx.save();
-      ctx.fillStyle = all[k] < 0 ? '#E24B4A' : '#185FA5';
-      ctx.beginPath();
-      ctx.arc(xAxis.getPixelForValue(k), yAxis.getPixelForValue(all[k]), 4, 0, Math.PI*2);
-      ctx.fill();
-      ctx.restore();
-    });
-
-    // ── 4. Ligne zéro pointillée ──
-    ctx.save();
-    ctx.strokeStyle = 'rgba(120,120,120,0.4)';
-    ctx.lineWidth = 1;
-    ctx.setLineDash([5,5]);
-    ctx.beginPath();
-    ctx.moveTo(xAxis.left, y0);
-    ctx.lineTo(xAxis.right, y0);
-    ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.restore();
-
-    // ── 5. Annotation : losange + flèche + label "Tréso positive" ──
-    const rx = xAxis.getPixelForValue(recoveryIdx);
-    const ry = y0;
-    // Losange bleu marine
-    ctx.save();
-    ctx.fillStyle = '#1A2B4A';
-    ctx.beginPath();
-    ctx.moveTo(rx,    ry-9);
-    ctx.lineTo(rx+7,  ry);
-    ctx.lineTo(rx,    ry+9);
-    ctx.lineTo(rx-7,  ry);
-    ctx.closePath();
-    ctx.fill();
-    ctx.restore();
-    // Flèche
-    const ax1 = rx+38, ay1 = ry-40;
-    const ax2 = rx+8,  ay2 = ry-8;
-    ctx.save();
-    ctx.strokeStyle = '#1A2B4A';
-    ctx.fillStyle   = '#1A2B4A';
-    ctx.lineWidth   = 1.8;
-    ctx.beginPath(); ctx.moveTo(ax1,ay1); ctx.lineTo(ax2,ay2); ctx.stroke();
-    const ang = Math.atan2(ay2-ay1, ax2-ax1);
-    ctx.beginPath();
-    ctx.moveTo(ax2,ay2);
-    ctx.lineTo(ax2-9*Math.cos(ang-0.4), ay2-9*Math.sin(ang-0.4));
-    ctx.lineTo(ax2-9*Math.cos(ang+0.4), ay2-9*Math.sin(ang+0.4));
-    ctx.closePath(); ctx.fill();
-    // Texte
-    ctx.font = 'bold 11px -apple-system,sans-serif';
-    ctx.textAlign = 'left';
-    ctx.fillText('Tréso positive', ax1+4, ay1-4);
-    ctx.fillText('(mois 11)',   ax1+4, ay1+10);
-    ctx.restore();
+const months=['Sep 26','Oct','Nov','Déc','Jan 27','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep 27','Oct','Nov','Déc','Jan 28','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep 28','Oct','Nov','Déc','Jan 29','Fév','Mar','Avr','Mai','Jun','Jul','Aoû 29'];
+const all=[10672, 19982, 9643, 6784, 4402, 1498, 9074, 11127, 15659, 22671, 32160, 44127, 47801, 50794, 53107, 55556, 57325, 59094, 61407, 64264, 67393, 70386, 72699, 74061, 93438, 109227, 121427, 134345, 143675, 153005, 165205, 180276, 196782, 212571, 224771, 231948];
+const customPlugin={id:'cp',afterDraw(chart){
+  const ctx=chart.ctx,xA=chart.scales.x,yA=chart.scales.y;
+  ctx.save();ctx.fillStyle='rgba(24,95,165,0.13)';
+  ctx.beginPath();ctx.moveTo(xA.getPixelForValue(0),yA.getPixelForValue(0));
+  for(let i=0;i<all.length;i++)ctx.lineTo(xA.getPixelForValue(i),yA.getPixelForValue(Math.max(0,all[i])));
+  ctx.lineTo(xA.getPixelForValue(all.length-1),yA.getPixelForValue(0));ctx.closePath();ctx.fill();ctx.restore();
+  ctx.save();ctx.lineWidth=2.5;
+  for(let i=0;i<all.length-1;i++){
+    ctx.strokeStyle=all[i]<0?'#E24B4A':'#185FA5';
+    ctx.beginPath();ctx.moveTo(xA.getPixelForValue(i),yA.getPixelForValue(all[i]));
+    ctx.lineTo(xA.getPixelForValue(i+1),yA.getPixelForValue(all[i+1]));ctx.stroke();
   }
-};
-
-new Chart(document.getElementById('c'), {
-  type: 'line',
-  data: {
-    labels: months,
-    datasets: [{
-      label: 'Trésorerie cumulée (€)',
-      data: all,
-      borderColor: 'rgba(0,0,0,0)',
-      borderWidth: 0,
-      pointRadius: 0,
-      fill: false,
-      tension: 0.3
-    }]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        callbacks: {
-          label: ctx => 'Tréso: ' + ctx.parsed.y.toLocaleString('fr-FR') + ' €'
-        }
-      }
-    },
-    scales: {
-      x: {
-        ticks: { maxRotation:45, font:{ size:10 } },
-        grid: { display:false }
-      },
-      y: {
-        min: -23564,
-        max: 817389,
-        ticks: {
-          callback: v => (v<0?'-':'') + Math.round(Math.abs(v)/1000) + 'k€'
-        },
-        grid: { color:'rgba(200,200,200,0.2)' }
-      }
-    }
-  },
-  plugins: [customPlugin]
-});
-</script>
-</body>
-</html>
+  [0,5,11,12,23,24,35].forEach(k=>{if(k>=all.length)return;
+    ctx.fillStyle=all[k]<0?'#E24B4A':'#185FA5';ctx.beginPath();
+    ctx.arc(xA.getPixelForValue(k),yA.getPixelForValue(all[k]),4,0,Math.PI*2);ctx.fill();
+  });
+  ctx.restore();
+}};
+new Chart(document.getElementById('c'),{type:'line',data:{labels:months,
+  datasets:[{label:'Trésorerie (€)',data:all,borderColor:'rgba(0,0,0,0)',borderWidth:0,pointRadius:0,fill:false}]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>'Tréso: '+ctx.parsed.y.toLocaleString('fr-FR')+' €'}}},
+    scales:{x:{ticks:{maxRotation:45,font:{size:10}},grid:{display:false}},
+             y:{min:1872,max:266740,
+                 ticks:{callback:v=>Math.round(v/1000)+'k€'},grid:{color:'rgba(200,200,200,0.2)'}}}
+  },plugins:[customPlugin]});</script>
