@@ -1,56 +1,33 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TGDC — Croissance Membres</title>
+<!DOCTYPE html><html lang="fr"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>TGDC — Croissance membres V3</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-         background: #f8f7f4; color: #1A2B4A; padding: 16px; min-height: 100vh; }
-  .header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
-             padding-bottom: 12px; border-bottom: 2px solid #C49A3C; }
-  .logo { width: 44px; height: 44px; background: #1A2B4A; border-radius: 8px;
-           display: flex; align-items: center; justify-content: center;
-           font-size: 18px; color: #C49A3C; font-weight: bold; flex-shrink: 0; }
-  .header-text h1 { font-size: 15px; font-weight: 700; color: #1A2B4A; }
-  .header-text p  { font-size: 12px; color: #888; margin-top: 2px; }
-  .metrics { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
-  .metric { background: white; border-radius: 10px; padding: 10px 14px;
-             flex: 1; min-width: 120px; border: 1px solid #eee; }
-  .metric .label { font-size: 11px; color: #888; margin-bottom: 3px; }
-  .metric .value { font-size: 18px; font-weight: 700; }
-  .chart-wrap { background: white; border-radius: 12px; padding: 16px;
-                 border: 1px solid #eee; position: relative; height: 340px; }
-  .chart-title { font-size: 13px; color: #888; text-align: center;
-                  margin-top: 12px; font-style: italic; }
-  .footer { margin-top: 12px; text-align: center; font-size: 11px; color: #aaa; }
-</style>
-</head>
-<body>
-<div class="header">
-  <div class="logo">TG</div>
-  <div class="header-text">
-    <h1>The Gentlemen Drivers Club</h1>
-    <p>Business Plan 2026 — Croissance Membres</p>
-  </div>
-</div>
-<div class="metrics"><div class="metric"><div class="label">Membres A1</div><div class="value" style="color:#185FA5">60</div></div>
-<div class="metric"><div class="label">Membres A2</div><div class="value" style="color:#185FA5">180</div></div>
-<div class="metric"><div class="label">Membres A3</div><div class="value" style="color:#185FA5">290</div></div>
-<div class="metric"><div class="label">Croissance</div><div class="value" style="color:#1D9E75">+383 %</div></div>
-</div>
-<div class="chart-wrap">
-  <canvas id="c"></canvas>
-</div>
-<p class="chart-title">Base membres A1→A3</p>
-<div class="footer">The Gentlemen Drivers Club · Business Plan confidentiel · 2026</div>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f8f7f4;color:#1A2B4A;padding:16px}
+.header{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid #C49A3C}
+.logo{width:44px;height:44px;background:#1A2B4A;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#C49A3C;font-weight:bold;flex-shrink:0}
+.header-text h1{font-size:15px;font-weight:700;color:#1A2B4A}
+.header-text p{font-size:12px;color:#888;margin-top:2px}
+.metrics{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.metric{background:white;border-radius:10px;padding:10px 14px;flex:1;min-width:110px;border:1px solid #eee}
+.metric .label{font-size:11px;color:#888;margin-bottom:3px}
+.metric .value{font-size:18px;font-weight:700}
+.chart-wrap{background:white;border-radius:12px;padding:16px;border:1px solid #eee;height:380px;position:relative}
+.chart-title{font-size:13px;color:#888;text-align:center;margin-top:10px;font-style:italic}
+.note{font-size:11px;color:#bbb;text-align:center;margin-top:4px}
+.footer{margin-top:12px;text-align:center;font-size:11px;color:#aaa}
+</style></head><body>
+<div class="header"><div class="logo">TG</div>
+<div class="header-text"><h1>The Gentlemen Drivers Club</h1><p>Business Plan V3 2026 — Croissance membres A1→A3</p></div></div><div class="metrics"><div class="metric"><div class="label">Membres A1</div><div class="value" style="color:#185FA5">60</div></div><div class="metric"><div class="label">Membres A2</div><div class="value" style="color:#185FA5">160</div></div><div class="metric"><div class="label">Membres A3</div><div class="value" style="color:#185FA5">290</div></div><div class="metric"><div class="label">Croissance</div><div class="value" style="color:#1D9E75">+383 %</div></div></div><div class="chart-wrap"><canvas id="c"></canvas></div>
+<p class="chart-title">Croissance de la base membres — V3 (60 → 160 → 290)</p>
+<p class="note">A1 : 40 Passion + 15 Club + 5 Gentleman · A2 : 90+50+20 · A3 : 150+90+50</p><div class="footer">The Gentlemen Drivers Club · BP V3 confidentiel · 2026</div></body></html>
 <script>
-
-const labs=['Année 1\n(2026-27)','Année 2\n(2027-28)','Année 3\n(2028-29)'];
-new Chart(document.getElementById('c'),{type:'bar',data:{labels:['Année 1','Année 2','Année 3'],datasets:[{label:'Passion (150€ HT/an)',data:[60,90,120],backgroundColor:'#185FA5',borderRadius:3},{label:'Club (400€ HT/an)',data:[0,54,90],backgroundColor:'#1A2B4A',borderRadius:3},{label:'Gentleman (1 000€ HT/an)',data:[0,36,80],backgroundColor:'#C49A3C',borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+ctx.parsed.y+' membres'}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,ticks:{callback:v=>v+' mbr'},grid:{color:'rgba(200,200,200,0.3)'}}}}});
-
-</script>
-</body>
-</html>
+new Chart(document.getElementById('c'),{type:'bar',data:{labels:['Année 1','Année 2','Année 3'],datasets:[
+  {label:'Passion (150€ HT/an)',data:[40,90,150],backgroundColor:'#185FA5',borderRadius:3},
+  {label:'Club (400€ HT/an)',data:[15,50,90],backgroundColor:'#1A2B4A',borderRadius:3},
+  {label:'Gentleman (1 000€ HT/an)',data:[5,20,50],backgroundColor:'#C49A3C',borderRadius:3}
+]},options:{responsive:true,maintainAspectRatio:false,
+  plugins:{legend:{position:'top'},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+ctx.parsed.y+' membres'}}},
+  scales:{x:{stacked:true,grid:{display:false}},
+           y:{stacked:true,ticks:{callback:v=>v+' mbr'},grid:{color:'rgba(200,200,200,0.3)'}}}}}); </script>
